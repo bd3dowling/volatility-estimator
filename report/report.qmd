@@ -1,0 +1,25 @@
+---
+title: Quant Data Engineer - Data Exercise
+author: Brendan Dowling
+number-sections: false
+format:
+  pdf:
+    toc: false
+    margin-left: 25mm
+    margin-right: 25mm
+    margin-top: 10mm
+    margin-bottom: 20mm
+jupyter: python3
+---
+
+# Some title
+
+Text
+
+## Subtitle
+
+More text
+
+# Another title
+
+Text
