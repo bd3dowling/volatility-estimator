@@ -12,6 +12,31 @@ format:
 jupyter: python3
 ---
 
+```{python}
+#| echo: false
+from pathlib import Path
+import pandas as pd
+import matplotlib.pyplot as plt
+from itertools import groupby
+
+np.random.seed(500)
+
+DATA_PATH = Path() / ".." / "data"
+RAW_DATA_PATH = DATA_PATH / "raw"
+CLEAN_DATA_PATH = DATA_PATH / "clean"
+
+TICKERS = ("a", "b", "c", "d")
+FILE_NAME_PATTERN = "prices_*_*.csv"
+
+START_TIME = pd.Timestamp("8:00").time()
+END_TIME = pd.Timestamp("16:30").time()
+LAST_DATE = "20170818"
+
+STOCK_SPLITS: dict[str, dict[str, float]] = {
+    "d": {"2017-05-22": 10}
+}
+```
+
 # Some title
 
 Text
@@ -23,3 +48,36 @@ More text
 # Another title
 
 Text
+
+```{python}
+raw_file_paths = sorted(RAW_DATA_PATH.glob(FILE_NAME_PATTERN))
+test_clean_frame = pd.read_parquet(f"{CLEAN_DATA_PATH / 'prices' / 'd'}.parquet")
+
+stock_frames = {
+    stock: base_process(stock_file_paths, STOCK_SPLITS.get(stock, {}))
+    for stock, stock_file_paths in groupby(
+        raw_file_paths_ex_last,
+        key=lambda file_path: file_path.name.split("_")[1],
+    )
+}
+
+fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(12, 12), sharex=True)
+
+for ax, (stock, data) in zip(axes, stock_frames.items()):
+    ax.step(data['ts'], data['price'], label=stock, lw=0.8)
+    ax.set_title(f'Stock Prices of {stock}')
+    ax.set_ylabel('Price')
+
+plt.xlabel('Date')
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+plt.figure(figsize=(12, 6))
+plt.step(x=pd.to_datetime(hist_vol_comp(test_clean_frame)["date"]), y = hist_vol_comp(test_clean_frame)["rolling_historical_volatility"], label="Tick")
+plt.step(x=pd.to_datetime(plot_frame_0["date"]), y=plot_frame_0["rolling_historical_volatility"], label="RV")
+plt.step(x=pd.to_datetime(plot_frame_1["date"]), y=plot_frame_1["rolling_historical_volatility"], label="SD")
+plt.step(x=plot_frame_2["ts"], y=plot_frame_2[0], label="YZ")
+plt.legend()
+```
