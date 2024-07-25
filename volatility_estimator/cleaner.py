@@ -10,8 +10,8 @@ def clean_price_frame(frame: pd.DataFrame, splits: dict[str, float]) -> pd.DataF
         .pipe(_filter_zero_prices)
         .pipe(_combine_identical_timestamps)
         .pipe(_remove_outliers)
-        .pipe(_add_date_column)
         .pipe(_adjust_for_all_splits, splits=splits)
+        .pipe(_add_date_column)
     )
 
 
@@ -35,26 +35,26 @@ def _adjust_for_all_splits(frame: pd.DataFrame, splits: dict[str, float]) -> pd.
 
 
 def _filter_non_trading_hours(frame: pd.DataFrame) -> pd.DataFrame:
-    # P1
+    # P1 of Barndorff-Nielsen (2008)
     return frame.loc[lambda row: row["ts"].dt.time >= START_TIME].loc[
         lambda row: row["ts"].dt.time <= END_TIME
     ]
 
 
 def _filter_zero_prices(frame: pd.DataFrame) -> pd.DataFrame:
-    # P2
+    # P2 of Barndorff-Nielsen (2008)
     return frame.loc[lambda row: row["price"] > 0]
 
 
 def _combine_identical_timestamps(frame: pd.DataFrame) -> pd.DataFrame:
-    # T3
+    # T3 of Barndorff-Nielsen (2008)
     return frame.groupby("ts", as_index=False).median()
 
 
 def _remove_outliers(
     frame: pd.DataFrame, window_size: int = 50, threshold: float = 10.0
 ) -> pd.DataFrame:
-    # Q4
+    # Q4 of Barndorff-Nielsen (2008)
     prices = frame["price"]
 
     if window_size % 2 != 0:

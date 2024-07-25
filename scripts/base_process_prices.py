@@ -1,10 +1,10 @@
+import sys
 from itertools import groupby
 
 from volatility_estimator.config import DATA_PATH, RAW_FILE_NAME_PATTERN
 from volatility_estimator.logger import get_logger
 from volatility_estimator.process import base_process_prices
 
-LAST_DATE = "20170818"
 STOCK_SPLITS: dict[str, dict[str, float]] = {"d": {"2017-05-22": 10}}
 
 if __name__ == "__main__":
@@ -25,4 +25,5 @@ if __name__ == "__main__":
     ):
         base_process_prices(stock, stock_file_paths, STOCK_SPLITS.get(stock, {}))
 
-    logger.info("Finishing processing!")
+    logger.info("Finished processing!")
+    sys.exit()

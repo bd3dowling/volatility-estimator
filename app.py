@@ -4,11 +4,18 @@ from pathlib import Path
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
+from scripts.base_compute_volatility import LOOKBACK_WINDOW
 from volatility_estimator.config import LOAD_DATA_PATH, RAW_FILE_NAME_PATTERN
+from volatility_estimator.estimator import VolatilityEstimatorName
 from volatility_estimator.logger import get_logger
-from volatility_estimator.process import incremental_process_prices
+from volatility_estimator.process import incremental_compute_volatility, incremental_process_prices
 
 STOCK_SPLITS: dict[str, dict[str, float]] = {"d": {"2017-05-22": 10}}
+ESTIMATOR_METHODS = [
+    VolatilityEstimatorName.TICK_AVERAGE_REALISED_VARIANCE,
+    VolatilityEstimatorName.CLOSE_TO_CLOSE_STD_DEVIATION,
+    VolatilityEstimatorName.YANG_ZHANG,
+]
 
 
 class Handler(FileSystemEventHandler):
@@ -37,6 +44,17 @@ class Handler(FileSystemEventHandler):
 
         logger.info(f"Deleting file {file_path.name}")
         file_path.unlink()
+
+        logger.info(f"Computing historical volatility for {stock}...")
+        for estimator_method in ESTIMATOR_METHODS:
+            incremental_compute_volatility(
+                stock=stock,
+                date=formatted_date,
+                estimator_method=estimator_method,
+                lookback_window=LOOKBACK_WINDOW,
+            )
+
+        logger.info("Finished handling event...")
 
 
 if __name__ == "__main__":
