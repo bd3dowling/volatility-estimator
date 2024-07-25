@@ -10,9 +10,28 @@ def clean_price_frame(frame: pd.DataFrame, splits: dict[str, float]) -> pd.DataF
         .pipe(_filter_zero_prices)
         .pipe(_combine_identical_timestamps)
         .pipe(_remove_outliers)
-        .pipe(_adjust_for_splits, splits=splits)
         .pipe(_add_date_column)
+        .pipe(_adjust_for_all_splits, splits=splits)
     )
+
+
+def adjust_for_split(frame: pd.DataFrame, split: float) -> pd.DataFrame:
+    # NOTE: copy to avoid side-effecting
+    frame = frame.copy()
+    frame["price"] = frame["price"] / split
+
+    return frame
+
+
+def _adjust_for_all_splits(frame: pd.DataFrame, splits: dict[str, float]) -> pd.DataFrame:
+    # NOTE: copy to avoid side-effecting
+    frame = frame.copy()
+
+    for split_date_str, split_ratio in splits.items():
+        split_date = pd.to_datetime(split_date_str, format="%Y-%m-%d")
+        frame.loc[frame["ts"] < split_date, "price"] /= split_ratio
+
+    return frame
 
 
 def _filter_non_trading_hours(frame: pd.DataFrame) -> pd.DataFrame:
@@ -74,17 +93,6 @@ def _remove_outliers(
     cleaned_frame = frame[~outliers]
 
     return cleaned_frame
-
-
-def _adjust_for_splits(frame: pd.DataFrame, splits: dict[str, float]) -> pd.DataFrame:
-    # copy to avoid side-effecting
-    frame = frame.copy()
-
-    for split_date_str, split_ratio in splits.items():
-        split_date = pd.to_datetime(split_date_str, format="%Y-%m-%d")
-        frame.loc[frame["ts"] < split_date, "price"] /= split_ratio
-
-    return frame
 
 
 def _add_date_column(frame: pd.DataFrame) -> pd.DataFrame:

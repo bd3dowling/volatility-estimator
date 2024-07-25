@@ -13,8 +13,8 @@ matplotlib = "^3.9.1"
 seaborn = "^0.13.2"
 pyarrow = "^17.0.0"
 pyyaml = "^6.0.1"
-click = "^8.1.7"
 python-dotenv = "^1.0.1"
+watchdog = "^4.0.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.4"
@@ -30,7 +30,9 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
+line-length = 100
 
+[tool.ruff.lint]
 # E - pycodestyle error
 # F - pyflakes
 # I - isort
@@ -39,8 +41,3 @@ build-backend = "poetry.core.masonry.api"
 # UP - pyupgrade
 # TODO: D - pydocstyle
 select = ["E", "F", "I", "N", "W", "UP"]
-
-# N805 - invalid-first-argument-name-for-method
-ignore = ["N805"]
-
-line-length = 100

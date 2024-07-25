@@ -94,8 +94,7 @@ class CloseToCloseAverageRealisedVariance(VolatilityEstimator):
 
         # Compute the rolling 30-day sum of daily realized variances
         rolling_variance = (
-            daily_realized_variance.rolling(window=self.lookback_window).mean()
-            * NUM_TRADING_DAYS
+            daily_realized_variance.rolling(window=self.lookback_window).mean() * NUM_TRADING_DAYS
         )
 
         # Convert rolling variance to volatility (annualized)

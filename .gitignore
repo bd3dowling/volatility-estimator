@@ -1,6 +1,12 @@
+# NOTE
+# .env
+
 # data
 *.csv
 *.parquet
+
+# logs
+*.json
 
 # macOS
 .DS_Store/
@@ -129,7 +135,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/

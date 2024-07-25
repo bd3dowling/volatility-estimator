@@ -15,7 +15,7 @@ NUM_TRADING_DAYS = int(os.getenv("NUM_TRADING_DAYS", 252))
 DATA_PATH = Path(os.getenv("DATA_PATH", "data"))
 
 # Derivative configs
-RAW_DATA_PATH = DATA_PATH / "raw"
+LOAD_DATA_PATH = DATA_PATH / "load"
 CLEAN_DATA_PATH = DATA_PATH / "clean"
 CLEAN_PRICE_PATH = CLEAN_DATA_PATH / "prices"
 HIST_VOL_PATH = CLEAN_DATA_PATH / "historical_volatility"
