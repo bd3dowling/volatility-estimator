@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from volatility_estimator.config import END_TIME, START_TIME
+
 
 def clean_price_frame(frame: pd.DataFrame, splits: dict[str, float]) -> pd.DataFrame:
     return (
