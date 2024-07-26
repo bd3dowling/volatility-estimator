@@ -41,7 +41,7 @@ def load_hist_vol(stock: str, method: VolatilityEstimatorName) -> pd.DataFrame:
 
 ## Preface
 
-The task, despite its simplicity has considerable depth and various considerations.
+The task, despite its simplicity, has considerable depth and various considerations.
 Below, I've outlined my approach and considerations relating to the engineering of the application,
 the process of cleaning the raw price data, and the computation of the historical volatility. In
 each, there are numerous further avenues for improvement which I discuss below.
@@ -107,12 +107,12 @@ cleaning. Several papers pointed to the methodology of
 "Realised Kernels in Practice: Trades and Quotes" (Barndorff-Nielsen et al., 2008), which I employed.
 Roughly, the approach then to cleaning was as follows:
 
-- Filter out any trades occurring outside trading hours (8:00 to 16:30).
+- Filter out any trades occurring outside trading hours (8:00 to 16:30 in UK / from EDA).
 - Filter out any zero prices.
 - Combine identical timestamps via the median.
 - Remove entries where the price deviated by more than 10 mean absolute deviations from a rolling centered mean (excluding the observation itself) of 50 observations.
 
-Additionally I added a date column (extracted from the `ts` column; could have used file name).
+Additionally, I added a date column (extracted from the `ts` column; could have used file name).
 I also added handling for stock splits, ensuring
 alignment between all old prices with ones post splits (i.e. treating latest as the base).
 
@@ -162,12 +162,12 @@ However, this will severely underestimate the total volatility since it doesn't 
 The naieve adjustment I implemented was to take the sequential returns over the full 30-day rolling window (i.e. including over-night/weekend returns).
 This isn't very well principled, however, and perhaps a better approach would be a manual handling/weighting
 of the computed intraday volatility and interday changes.
-Regardless, the approach works reasonably well and aligns with the other two higher-level approaches; see @fig-vols.
+Regardless, the approach works reasonably well and aligns with the other two higher-level approaches (see @fig-vols), though is somewhat smoother likely due to the impact of lower relative intraday volatility.
 
 However, there's almost certainly some non-trivial market microstructure noise due to things like
 price dicreteness and bid-ask bounce. Essentially, the price observations are themselves noisy (in
 a fashion we can't easily process/clean away). There are a few methods I encountered in a module
-I sat in on; in particular, the non-parametric realised-kernel estimator method
+I sat in on tackling this issue; in particular, the non-parametric realised-kernel estimator method
 (Barndorff-Nielsen et al., 2008) is quite popular and effective for handling the autocorrelations
 that may be present:
 $$
@@ -184,7 +184,7 @@ X_t \mid X_{t-1} &\sim \mathcal{N}(\mu + \rho(x_{t-1} - \mu), \sigma^2) \\
 Y_t \mid X_t &\sim \mathcal{N}(0, e^{x_t})
 \end{align*}
 (with $X_t$ the unobserved true volatility and $Y_t$ the
-log-returns) on which we could run SMC-squared or Particle-Marginal-Metropolis-Hastings to infer the parameters (either rolling or over full full history).
+log-returns) on which we could run SMC-squared or Particle-Marginal-Metropolis-Hastings to infer the parameters (either rolling or over full history).
 Since we're in a Bayesian setting, the MMS issue is dealt
 with implicitly by infering the the true state/volatility.
 Furthermore, we can model the state dynamics however we want (not necessarily Gaussian), including
